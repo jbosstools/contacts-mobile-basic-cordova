@@ -32,22 +32,18 @@
         <!-- Explicitly declaring the source encoding eliminates the following message: -->
         <!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent! -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
+
         <!-- JBoss dependency versions -->
- 
+
         <version.jboss.maven.plugin>7.4.Final</version.jboss.maven.plugin>
 
         <!-- Define the version of the JBoss BOMs we want to import to specify tested stacks. -->
         <version.jboss.bom.eap>1.0.4.Final-redhat-9</version.jboss.bom.eap>
         <version.jboss.bom.wfk>2.4.0-redhat-2</version.jboss.bom.wfk>
 
-        <!-- Other dependency versions -->
-        <version.org.eclipse.m2e>1.0.0</version.org.eclipse.m2e>
-        <version.ro.isdc.wro4j>1.4.4</version.ro.isdc.wro4j>
-
         <!-- other plugin versions -->
-        <version.surefire.plugin>2.10</version.surefire.plugin>
-        <version.war.plugin>2.1.1</version.war.plugin>
+        <version.surefire.plugin>2.18.1</version.surefire.plugin>
+        <version.war.plugin>2.6</version.war.plugin>
 
         <!-- maven-compiler-plugin -->
         <maven.compiler.target>1.6</maven.compiler.target>
@@ -64,13 +60,13 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- JBoss distributes a complete set of Java EE 6 APIs including 
-                a Bill of Materials (BOM). A BOM specifies the versions of a "stack" (or 
-                a collection) of artifacts. We use this here so that we always get the correct 
-                versions of artifacts. Here we use the jboss-javaee-6.0-with-tools stack 
-                (you can read this as the JBoss stack of the Java EE 6 APIs, with some extras 
-                tools for your project, such as Arquillian for testing) and the jboss-javaee-6.0-with-hibernate 
-                stack you can read this as the JBoss stack of the Java EE 6 APIs, with extras 
+            <!-- JBoss distributes a complete set of Java EE 6 APIs including
+                a Bill of Materials (BOM). A BOM specifies the versions of a "stack" (or
+                a collection) of artifacts. We use this here so that we always get the correct
+                versions of artifacts. Here we use the jboss-javaee-6.0-with-tools stack
+                (you can read this as the JBoss stack of the Java EE 6 APIs, with some extras
+                tools for your project, such as Arquillian for testing) and the jboss-javaee-6.0-with-hibernate
+                stack you can read this as the JBoss stack of the Java EE 6 APIs, with extras
                 from the Hibernate family of projects) -->
             <dependency>
                 <groupId>org.jboss.bom.wfk</groupId>
@@ -88,7 +84,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    
+
     <dependencies>
         <!-- First declare the APIs we depend on and need for compilation. All of them are provided by JBoss -->
 
@@ -182,7 +178,7 @@
     </dependencies>
 
     <build>
-        <!-- Maven will append the version to the finalName (which is the name given to the generated war, and hence the context 
+        <!-- Maven will append the version to the finalName (which is the name given to the generated war, and hence the context
             root) -->
         <finalName>${project.artifactId}</finalName>
         <plugins>
@@ -201,10 +197,10 @@
                 <artifactId>jboss-as-maven-plugin</artifactId>
                 <version>${version.jboss.maven.plugin}</version>
             </plugin>
-            
+
         </plugins>
     </build>
-    
+
     <profiles>
         <profile>
             <!-- The default profile skips all tests, though you can tune it to run just unit tests based on a custom pattern -->
@@ -239,76 +235,6 @@
                         <configuration>
                             <outputDirectory>deployments</outputDirectory>
                             <warName>ROOT</warName>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <!-- Use this profile to use the wro4j plugin for validation, concatenation and -->
-            <!-- minification of JavaScript and CSS files during the build -->
-            <id>minify</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-                        <plugin>
-                            <groupId>org.eclipse.m2e</groupId>
-                            <artifactId>lifecycle-mapping</artifactId>
-                            <version>${version.org.eclipse.m2e}</version>
-                            <configuration>
-                                <lifecycleMappingMetadata>
-                                    <pluginExecutions>
-                                        <pluginExecution>
-                                            <pluginExecutionFilter>
-                                                <groupId>ro.isdc.wro4j</groupId>
-                                                <artifactId>
-                                                    wro4j-maven-plugin
-                                                </artifactId>
-                                                <version>${version.ro.isdc.wro4j}</version>
-                                                <goals>
-                                                    <goal>run</goal>
-                                                </goals>
-                                            </pluginExecutionFilter>
-                                            <action>
-                                                <ignore></ignore>
-                                            </action>
-                                        </pluginExecution>
-                                    </pluginExecutions>
-                                </lifecycleMappingMetadata>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-                <plugins>
-                    <plugin>
-                        <groupId>ro.isdc.wro4j</groupId>
-                        <artifactId>wro4j-maven-plugin</artifactId>
-                        <version>${version.ro.isdc.wro4j}</version>
-                        <executions>
-                            <execution>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <targetGroups>app.min,m.screen.min,d.screen.min</targetGroups>
-                            <cssDestinationFolder>${project.build.directory}/${project.build.finalName}/css/</cssDestinationFolder>
-                            <jsDestinationFolder>${project.build.directory}/${project.build.finalName}/js/</jsDestinationFolder>
-                            <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${version.surefire.plugin}</version>
-                        <configuration>
-                            <skip>true</skip>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -396,5 +322,5 @@
             </build>
         </profile>
     </profiles>
-    
+
 </project>
